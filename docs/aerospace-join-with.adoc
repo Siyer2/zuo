@@ -9,7 +9,7 @@ include::util/man-attributes.adoc[]
 == Synopsis
 [verse]
 // tag::synopsis[]
-aerospace join-with [-h|--help] [--window-id <window-id>] (left|down|up|right)
+zuo join-with [-h|--help] [--window-id <window-id>] (left|down|up|right)
 
 // end::synopsis[]
 

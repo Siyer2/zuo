@@ -9,14 +9,14 @@ include::util/man-attributes.adoc[]
 == Synopsis
 [verse]
 // tag::synopsis[]
-aerospace focus [-h|--help] [--ignore-floating] [--wrap-around]
+zuo focus [-h|--help] [--ignore-floating] [--wrap-around]
                 [--boundaries <boundary>] [--boundaries-action <action>]
                 (left|down|up|right)
-aerospace focus [-h|--help] [--ignore-floating] [--wrap-around]
+zuo focus [-h|--help] [--ignore-floating] [--wrap-around]
                 [--boundaries <boundary>] [--boundaries-action <action>]
                 (dfs-next|dfs-prev)
-aerospace focus [-h|--help] --window-id <window-id>
-aerospace focus [-h|--help] --dfs-index <dfs-index>
+zuo focus [-h|--help] --window-id <window-id>
+zuo focus [-h|--help] --dfs-index <dfs-index>
 
 // end::synopsis[]
 

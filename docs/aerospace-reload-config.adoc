@@ -9,7 +9,7 @@ include::util/man-attributes.adoc[]
 == Synopsis
 [verse]
 // tag::synopsis[]
-aerospace reload-config [-h|--help] [--no-gui] [--dry-run]
+zuo reload-config [-h|--help] [--no-gui] [--dry-run]
 
 // end::synopsis[]
 

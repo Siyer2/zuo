@@ -2,7 +2,7 @@
 
 ## Users cannot create GitHub Issues directly
 
-AeroSpace project doesn't accept Issues directly - we ask you to create a [Discussion](https://github.com/nikitabobko/AeroSpace/discussions) first.
+Zuo project doesn't accept Issues directly - we ask you to create a [Discussion](https://github.com/nikitabobko/AeroSpace/discussions) first.
 
 The submitted Issues are often either obvious duplicates, environmental problems, or configuration errors by the users themselves.
 For a hobby project, I don't have enough time and energy to process every such submitted Issue.
@@ -30,12 +30,12 @@ Rules:
 
 **Consider including in bug reports**
 
-* `aerospace debug-windows` output, if the problem is about handling some windows
+* `zuo debug-windows` output, if the problem is about handling some windows
 * Screenshots of problematic windows
 * Videos of problematic windows
 * What did you try to resolve the issue?
 * Your config
-* AeroSpace version
+* Zuo version
 * macOS version
 
 **Consider including in feature request**
@@ -103,16 +103,16 @@ The prior discussion is here for you to minimize the risk of rejection.
 
 ## Spread the word
 
-Do you like the project? Does AeroSpace finally fix your problems with windows management on macOS? Good to hear it!
+Do you like the project? Does Zuo finally fix your problems with windows management on macOS? Good to hear it!
 
 * Spread the word in social networks! (Don't forget to share the link :) )
-* Talk about AeroSpace to your colleagues and friends
+* Talk about Zuo to your colleagues and friends
 * Write a blogpost about your workflows
 * Record a YouTube video
 
 ## Share your workflow and tips
 
-Submit your tips to [the Goodies page](https://nikitabobko.github.io/AeroSpace/goodies). The source code of the page can be found in `./docs` directory
+Submit your tips to [the Goodies page](https://nikitabobko.github.io/Zuo/goodies). The source code of the page can be found in `./docs` directory
 
 ## Support the project financially
 

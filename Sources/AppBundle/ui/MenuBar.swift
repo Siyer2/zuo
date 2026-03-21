@@ -5,8 +5,8 @@ import SwiftUI
 @MainActor
 public func menuBar(viewModel: TrayMenuModel) -> some Scene { // todo should it be converted to "SwiftUI struct"?
     MenuBarExtra {
-        let shortIdentification = "\(aeroSpaceAppName) v\(aeroSpaceAppVersion) \(gitShortHash)"
-        let identification      = "\(aeroSpaceAppName) v\(aeroSpaceAppVersion) \(gitHash)"
+        let shortIdentification = "\(zuoAppName) v\(zuoAppVersion) \(gitShortHash)"
+        let identification      = "\(zuoAppName) v\(zuoAppVersion) \(gitHash)"
         Text(shortIdentification)
         Button("Copy to clipboard") { identification.copyToClipboard() }
             .keyboardShortcut("C", modifiers: .command)
@@ -26,13 +26,6 @@ public func menuBar(viewModel: TrayMenuModel) -> some Scene { // todo should it 
             }
             Divider()
         }
-        Button {
-            NSWorkspace.shared.open(URL(string: "https://github.com/sponsors/nikitabobko").orDie())
-            viewModel.sponsorshipMessage = sponsorshipPrompts.randomElement().orDie()
-        } label: {
-            Text("Sponsor AeroSpace on GitHub")
-            Text(viewModel.sponsorshipMessage)
-        }
         Divider()
         Button(viewModel.isEnabled ? "Disable" : "Enable") {
             Task {
@@ -45,7 +38,7 @@ public func menuBar(viewModel: TrayMenuModel) -> some Scene { // todo should it 
         getExperimentalUISettingsMenu(viewModel: viewModel)
         openConfigButton()
         reloadConfigButton()
-        Button("Quit \(aeroSpaceAppName)") {
+        Button("Quit \(zuoAppName)") {
             Task {
                 defer { terminateApp() }
                 try await terminationHandler.beforeTermination()

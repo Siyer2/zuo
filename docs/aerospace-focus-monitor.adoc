@@ -9,9 +9,9 @@ include::util/man-attributes.adoc[]
 == Synopsis
 [verse]
 // tag::synopsis[]
-aerospace focus-monitor [-h|--help] [--wrap-around] (left|down|up|right)
-aerospace focus-monitor [-h|--help] [--wrap-around] (next|prev)
-aerospace focus-monitor [-h|--help] <monitor-pattern>...
+zuo focus-monitor [-h|--help] [--wrap-around] (left|down|up|right)
+zuo focus-monitor [-h|--help] [--wrap-around] (next|prev)
+zuo focus-monitor [-h|--help] <monitor-pattern>...
 
 // end::synopsis[]
 

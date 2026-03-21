@@ -9,7 +9,7 @@ include::util/man-attributes.adoc[]
 == Synopsis
 [verse]
 // tag::synopsis[]
-aerospace list-apps [-h|--help] [--macos-native-hidden [no]] [--format <output-format>] [--count] [--json]
+zuo list-apps [-h|--help] [--macos-native-hidden [no]] [--format <output-format>] [--count] [--json]
 
 // end::synopsis[]
 

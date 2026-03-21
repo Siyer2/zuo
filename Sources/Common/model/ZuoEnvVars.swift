@@ -1,0 +1,2 @@
+public let ZUO_WINDOW_ID = "ZUO_WINDOW_ID"
+public let ZUO_WORKSPACE = "ZUO_WORKSPACE"

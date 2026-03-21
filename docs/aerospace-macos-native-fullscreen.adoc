@@ -9,9 +9,9 @@ include::util/man-attributes.adoc[]
 == Synopsis
 [verse]
 // tag::synopsis[]
-aerospace macos-native-fullscreen [-h|--help] [--window-id <window-id>]
-aerospace macos-native-fullscreen [-h|--help] [--window-id <window-id>] [--fail-if-noop] on
-aerospace macos-native-fullscreen [-h|--help] [--window-id <window-id>] [--fail-if-noop] off
+zuo macos-native-fullscreen [-h|--help] [--window-id <window-id>]
+zuo macos-native-fullscreen [-h|--help] [--window-id <window-id>] [--fail-if-noop] on
+zuo macos-native-fullscreen [-h|--help] [--window-id <window-id>] [--fail-if-noop] off
 
 // end::synopsis[]
 

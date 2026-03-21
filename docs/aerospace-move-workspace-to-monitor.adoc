@@ -9,9 +9,9 @@ include::util/man-attributes.adoc[]
 == Synopsis
 [verse]
 // tag::synopsis[]
-aerospace move-workspace-to-monitor [-h|--help] [--workspace <workspace>] [--wrap-around] (left|down|up|right)
-aerospace move-workspace-to-monitor [-h|--help] [--workspace <workspace>] [--wrap-around] (next|prev)
-aerospace move-workspace-to-monitor [-h|--help] [--workspace <workspace>] <monitor-pattern>...
+zuo move-workspace-to-monitor [-h|--help] [--workspace <workspace>] [--wrap-around] (left|down|up|right)
+zuo move-workspace-to-monitor [-h|--help] [--workspace <workspace>] [--wrap-around] (next|prev)
+zuo move-workspace-to-monitor [-h|--help] [--workspace <workspace>] <monitor-pattern>...
 
 // end::synopsis[]
 

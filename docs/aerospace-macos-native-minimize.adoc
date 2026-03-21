@@ -9,7 +9,7 @@ include::util/man-attributes.adoc[]
 == Synopsis
 [verse]
 // tag::synopsis[]
-aerospace macos-native-minimize [-h|--help] [--window-id <window-id>]
+zuo macos-native-minimize [-h|--help] [--window-id <window-id>]
 
 // end::synopsis[]
 

@@ -2,7 +2,7 @@ import AppKit
 import Darwin
 import Foundation
 
-public let socketPath = "/tmp/\(aeroSpaceAppId)-\(unixUserName).sock"
+public let socketPath = "/tmp/\(zuoAppId)-\(unixUserName).sock"
 public let unixUserName = NSUserName()
 public let mainModeId = "main"
 
@@ -28,7 +28,7 @@ public func dieT<T>(
             Please describe what you did to trigger this error
 
         Message: \(_message)
-        Version: \(aeroSpaceAppVersion)
+        Version: \(zuoAppVersion)
         Git hash: \(gitHash)
         refreshSessionEvent: \(refreshSessionEvent.prettyDescription)
         Date: \(Date.now)
@@ -48,9 +48,9 @@ public func dieT<T>(
     if !isUnitTest && isServer {
         showMessageInGui(
             filenameIfConsoleApp: recursionDetectorDuringTermination
-                ? "aerospace-runtime-error-recursion.txt"
-                : "aerospace-runtime-error.txt",
-            title: "AeroSpace Runtime Error",
+                ? "zuo-runtime-error-recursion.txt"
+                : "zuo-runtime-error.txt",
+            title: "Zuo Runtime Error",
             message: message,
         )
     }

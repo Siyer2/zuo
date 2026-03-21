@@ -153,7 +153,7 @@ func parseAfterLoginCommand(_ raw: TOMLValueConvertible, _ backtrace: TomlBacktr
     if let array = raw.array, array.count == 0 {
         return .success([])
     }
-    let msg = "after-login-command is deprecated since AeroSpace 0.19.0. https://github.com/nikitabobko/AeroSpace/issues/1482"
+    let msg = "after-login-command is deprecated since Zuo 0.19.0. https://github.com/nikitabobko/AeroSpace/issues/1482"
     return .failure(.semantic(backtrace, msg))
 }
 

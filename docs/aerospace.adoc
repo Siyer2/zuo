@@ -5,15 +5,15 @@ include::util/man-attributes.adoc[]
 
 == Synopsis
 [verse]
-aerospace [-h|--help] [-v|--version] <subcommand> [<subcommand-options>...] [<subcommand-arguments>...]
+zuo [-h|--help] [-v|--version] <subcommand> [<subcommand-options>...] [<subcommand-arguments>...]
 
 == Description
 
-AeroSpace is an i3-like tiling window manager for macOS
+Zuo is an i3-like tiling window manager for macOS
 
-*aerospace* command line program is used to manipulate AeroSpace and query its state.
+*zuo* command line program is used to manipulate Zuo and query its state.
 
-See https://nikitabobko.github.io/AeroSpace/commands for available <subcommand> options
+See https://nikitabobko.github.io/Zuo/commands for available <subcommand> options
 
 See each <subcommand> individual man page for <subcommand-options> and <subcommand-arguments>
 

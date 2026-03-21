@@ -1,5 +1,5 @@
 ifndef::env-site[]
 :doctype: manpage
-:manmanual: AeroSpace Manual
-:mansource: AeroSpace
+:manmanual: Zuo Manual
+:mansource: Zuo
 endif::[]

@@ -9,7 +9,7 @@ include::util/man-attributes.adoc[]
 == Synopsis
 [verse]
 // tag::synopsis[]
-aerospace exec-and-forget <bash-script>
+zuo exec-and-forget <bash-script>
 
 // end::synopsis[]
 

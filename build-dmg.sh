@@ -20,7 +20,7 @@ dmg_staging=".release/dmg-staging"
 
 rm -rf "$dmg_staging"
 mkdir -p "$dmg_staging"
-cp -r ".release/AeroSpace-v$build_version/AeroSpace.app" "$dmg_staging/"
+cp -r ".release/Zuo-v$build_version/Zuo.app" "$dmg_staging/"
 ln -s /Applications "$dmg_staging/Applications"
 
 hdiutil create \

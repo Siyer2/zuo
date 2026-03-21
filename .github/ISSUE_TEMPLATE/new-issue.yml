@@ -4,7 +4,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        AeroSpace project doesn't accept Issues directly. Please prefer GitHub Discussions. See: https://github.com/nikitabobko/AeroSpace/issues/947
+        Zuo project doesn't accept Issues directly. Please prefer GitHub Discussions. See: https://github.com/nikitabobko/AeroSpace/issues/947
   - type: checkboxes
     id: checkbox
     attributes:

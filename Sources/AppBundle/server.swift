@@ -20,10 +20,10 @@ func startUnixSocketServer() {
 func toggleReleaseServerIfDebug(_ state: EnableCmdArgs.State) async {
     if serverArgs.isReadOnly { return }
     if !isDebug { return }
-    let socketFile = "/tmp/\(stableAeroSpaceAppId)-\(unixUserName).sock"
+    let socketFile = "/tmp/\(stableZuoAppId)-\(unixUserName).sock"
     let connection = NWConnection(to: NWEndpoint.unix(path: socketFile), using: .tcp)
     defer { connection.cancel() }
-    if await connection.startBlocking().error != nil { // Can't connect, AeroSpace.app is not running
+    if await connection.startBlocking().error != nil { // Can't connect, Zuo.app is not running
         return
     }
 
@@ -32,7 +32,7 @@ func toggleReleaseServerIfDebug(_ state: EnableCmdArgs.State) async {
     _ = await connection.readNonAtomic()
 }
 
-private let serverVersionAndHash = "\(aeroSpaceAppVersion) \(gitHash)"
+private let serverVersionAndHash = "\(zuoAppVersion) \(gitHash)"
 
 private func newConnection(_ connection: NWConnection) async { // todo add exit codes
     func answerToClient(exitCode: Int32, stdout: String = "", stderr: String = "") async {
@@ -76,8 +76,8 @@ private func newConnection(_ connection: NWConnection) async { // todo add exit 
         guard let token: RunSessionGuard = await .isServerEnabled(orIsEnableCommand: command) else {
             await answerToClient(
                 exitCode: 1,
-                stderr: "\(aeroSpaceAppName) server is disabled and doesn't accept commands. " +
-                    "You can use 'aerospace enable on' to enable the server",
+                stderr: "\(zuoAppName) server is disabled and doesn't accept commands. " +
+                    "You can use 'zuo enable on' to enable the server",
             )
             continue
         }
@@ -116,7 +116,7 @@ private func newConnection(_ connection: NWConnection) async { // todo add exit 
                     serverVersionAndHash: serverVersionAndHash,
                 )
             if request.windowId == nil || request.workspace == nil {
-                answer.stderr += "\n\nAeroSpace client has sent incomplete JSON request. 'windowId' or/and 'workspace' fields are missing. Please forward your AEROSPACE_WINDOW_ID and AEROSPACE_WORKSPACE environment variables to these JSON fields. If the appropriate environment variables are empty, pass explict 'null' in the JSON."
+                answer.stderr += "\n\nZuo client has sent incomplete JSON request. 'windowId' or/and 'workspace' fields are missing. Please forward your ZUO_WINDOW_ID and ZUO_WORKSPACE environment variables to these JSON fields. If the appropriate environment variables are empty, pass explict 'null' in the JSON."
             }
             await answerToClient(answer)
             continue

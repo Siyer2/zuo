@@ -9,7 +9,7 @@ include::util/man-attributes.adoc[]
 == Synopsis
 [verse]
 // tag::synopsis[]
-aerospace split [-h|--help] [--window-id <window-id>] (horizontal|vertical|opposite)
+zuo split [-h|--help] [--window-id <window-id>] (horizontal|vertical|opposite)
 
 // end::synopsis[]
 

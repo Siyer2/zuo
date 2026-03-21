@@ -1,7 +1,7 @@
 == Resources
 
 *Project homepage:* https://github.com/nikitabobko/AeroSpace +
-*Guide:* https://nikitabobko.github.io/AeroSpace/guide +
+*Guide:* https://nikitabobko.github.io/Zuo/guide +
 
 == BUGS
 
@@ -13,7 +13,7 @@ Maintainers will move verified bugs to https://github.com/nikitabobko/AeroSpace/
 
 Copyright (C) 2023 Nikita Bobko +
 Free use of this software is granted under the terms of the MIT License +
-You can find the full text of AeroSpace license and its dependencies in the 'legal' directory of the distributed zip archive.
+You can find the full text of Zuo license and its dependencies in the 'legal' directory of the distributed zip archive.
 
 == AUTHOR
 
