@@ -1,0 +1,370 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3DED5ABAB41872E997ECEE90 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4A5611C8AF471794B87E914E /* Assets.xcassets */; };
+		94EA795F244AA4D5FD821BE7 /* ZuoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E04B5BC39C004E8A35536C6 /* ZuoApp.swift */; };
+		DCE056279CF9E1CAF75DE4DE /* AppBundle in Frameworks */ = {isa = PBXBuildFile; productRef = 4D92B6D4CFFB5DB3B59988C1 /* AppBundle */; };
+		E30824B9353D24B7243E0191 /* default-config.toml in Resources */ = {isa = PBXBuildFile; fileRef = 2BF854DBB0BDA221BF08F607 /* default-config.toml */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		2BF854DBB0BDA221BF08F607 /* default-config.toml */ = {isa = PBXFileReference; path = "default-config.toml"; sourceTree = "<group>"; };
+		4A5611C8AF471794B87E914E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		506D9BA078CC7223F60A988E /* zuo */ = {isa = PBXFileReference; lastKnownFileType = folder; name = zuo; path = .; sourceTree = SOURCE_ROOT; };
+		6E04B5BC39C004E8A35536C6 /* ZuoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZuoApp.swift; sourceTree = "<group>"; };
+		E2138794E3F9FCB8ABB6F8AC /* Zuo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Zuo.entitlements; sourceTree = "<group>"; };
+		ED351574BC2131A41E5824EF /* Zuo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Zuo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		881EBA7313E5914134BD2082 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DCE056279CF9E1CAF75DE4DE /* AppBundle in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		03A5D3CE9BE7B94616C2A687 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				ED351574BC2131A41E5824EF /* Zuo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		253590B201C2FCFC6CEB5BEA /* config-examples */ = {
+			isa = PBXGroup;
+			children = (
+				2BF854DBB0BDA221BF08F607 /* default-config.toml */,
+			);
+			name = "config-examples";
+			path = "docs/config-examples";
+			sourceTree = "<group>";
+		};
+		2BF2E24E2592AFEDEA2A7D4B /* resources */ = {
+			isa = PBXGroup;
+			children = (
+				4A5611C8AF471794B87E914E /* Assets.xcassets */,
+				E2138794E3F9FCB8ABB6F8AC /* Zuo.entitlements */,
+			);
+			path = resources;
+			sourceTree = "<group>";
+		};
+		2E4287DFDD8BE7D46A307D1F /* ZuoApp */ = {
+			isa = PBXGroup;
+			children = (
+				6E04B5BC39C004E8A35536C6 /* ZuoApp.swift */,
+			);
+			name = ZuoApp;
+			path = Sources/ZuoApp;
+			sourceTree = "<group>";
+		};
+		64DA8D4EACBB1B7F97B42F1F /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				506D9BA078CC7223F60A988E /* zuo */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		7561F9B42D0A606DF2D46D41 = {
+			isa = PBXGroup;
+			children = (
+				253590B201C2FCFC6CEB5BEA /* config-examples */,
+				64DA8D4EACBB1B7F97B42F1F /* Packages */,
+				2BF2E24E2592AFEDEA2A7D4B /* resources */,
+				2E4287DFDD8BE7D46A307D1F /* ZuoApp */,
+				03A5D3CE9BE7B94616C2A687 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CC9A7FA47DF5EAC5ABE2EC5A /* Zuo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BEF89102FCB96BA5C5C347E0 /* Build configuration list for PBXNativeTarget "Zuo" */;
+			buildPhases = (
+				06F2E31D6C2B20A1908455F4 /* Sources */,
+				A550769382D51E50D59C3B47 /* Resources */,
+				881EBA7313E5914134BD2082 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Zuo;
+			packageProductDependencies = (
+				4D92B6D4CFFB5DB3B59988C1 /* AppBundle */,
+			);
+			productName = Zuo;
+			productReference = ED351574BC2131A41E5824EF /* Zuo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A493D2C9CFC9660B351E8121 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+			};
+			buildConfigurationList = 2F86CF02CF8FDAF56E0940E7 /* Build configuration list for PBXProject "Zuo" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 7561F9B42D0A606DF2D46D41;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B173FE9FB5EF46CF4E1DC0C1 /* XCLocalSwiftPackageReference "." */,
+			);
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CC9A7FA47DF5EAC5ABE2EC5A /* Zuo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A550769382D51E50D59C3B47 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3DED5ABAB41872E997ECEE90 /* Assets.xcassets in Resources */,
+				E30824B9353D24B7243E0191 /* default-config.toml in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		06F2E31D6C2B20A1908455F4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				94EA795F244AA4D5FD821BE7 /* ZuoApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A8AECE4BAF5071EF00759E43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = resources/Zuo.entitlements;
+				CODE_SIGN_IDENTITY = "zuo-codesign-certificate";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = "0.0.0-SNAPSHOT";
+				PRODUCT_BUNDLE_IDENTIFIER = com.syamiyer.zuo.debug;
+				PRODUCT_NAME = "Zuo-Debug";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.2;
+			};
+			name = Debug;
+		};
+		BB7446F066454B7EEA70B314 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		D2DDCBFB2D5AD02A3AA8A0D0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = resources/Zuo.entitlements;
+				CODE_SIGN_IDENTITY = "zuo-codesign-certificate";
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = "0.0.0-SNAPSHOT";
+				PRODUCT_BUNDLE_IDENTIFIER = com.syamiyer.zuo;
+				PRODUCT_NAME = Zuo;
+				SDKROOT = macosx;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_VERSION = 6.2;
+			};
+			name = Release;
+		};
+		EF31A2E8D2CB99B21CF23A67 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2F86CF02CF8FDAF56E0940E7 /* Build configuration list for PBXProject "Zuo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EF31A2E8D2CB99B21CF23A67 /* Debug */,
+				BB7446F066454B7EEA70B314 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BEF89102FCB96BA5C5C347E0 /* Build configuration list for PBXNativeTarget "Zuo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A8AECE4BAF5071EF00759E43 /* Debug */,
+				D2DDCBFB2D5AD02A3AA8A0D0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		B173FE9FB5EF46CF4E1DC0C1 /* XCLocalSwiftPackageReference "." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = .;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4D92B6D4CFFB5DB3B59988C1 /* AppBundle */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppBundle;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A493D2C9CFC9660B351E8121 /* Project object */;
+}
