@@ -36,6 +36,7 @@ public func menuBar(viewModel: TrayMenuModel) -> some Scene { // todo should it 
             }
         }.keyboardShortcut("E", modifiers: .command)
         getExperimentalUISettingsMenu(viewModel: viewModel)
+        settingsButton()
         openConfigButton()
         reloadConfigButton()
         Button("Quit \(zuoAppName)") {
@@ -100,6 +101,13 @@ func shortcutGroup(label: some View, content: some View) -> some View {
                 .foregroundStyle(Color.secondary)
             content
         }
+    }
+}
+
+@MainActor @ViewBuilder
+func settingsButton() -> some View {
+    Button("Settings...") {
+        SettingsViewModel.shared.isSettingsOpen = true
     }
 }
 
