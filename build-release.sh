@@ -44,7 +44,7 @@ cp -r .build/apple/Products/Release/zuo .release
 ### SIGN CLI ###
 ################
 
-codesign -s "$codesign_identity" --options runtime .release/zuo
+codesign -s "$codesign_identity" --options runtime --timestamp .release/zuo
 
 ################
 ### VALIDATE ###
