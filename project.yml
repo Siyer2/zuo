@@ -34,6 +34,7 @@ targets:
         # Agent apps do not appear in the Dock or in the Force Quit window (cmd-opt-esc)
         INFOPLIST_KEY_LSUIElement: YES
         CODE_SIGN_IDENTITY: ${XCODEGEN_ZUO_CODE_SIGN_IDENTITY}
+        ENABLE_HARDENED_RUNTIME: YES
       configs:
         Debug:
           PRODUCT_NAME: Zuo-Debug
