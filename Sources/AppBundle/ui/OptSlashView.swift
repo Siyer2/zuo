@@ -62,11 +62,11 @@ struct OptSlashView: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: "magnifyingglass")
+            Image(systemName: "bolt")
                 .font(.system(size: 22, weight: .light))
                 .foregroundStyle(.secondary)
             AutoFocusTextField(
-                placeholder: "Zuo Workflow Search",
+                placeholder: "Run an OptSlash workflow",
                 onSubmit: onSubmit,
                 onChange: onChange,
                 onCancel: onCancel
