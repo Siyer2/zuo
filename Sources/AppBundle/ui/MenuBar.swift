@@ -42,12 +42,24 @@ public func menuBar(viewModel: TrayMenuModel) -> some Scene { // todo should it 
             }
         }.keyboardShortcut("Q", modifiers: .command)
     } label: {
-        if viewModel.isEnabled {
-            MenuBarLabel().environmentObject(viewModel)
-        } else {
-            Image(systemName: "pause.circle.fill")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
+        switch viewModel.workflowRunState {
+            case .running:
+                if #available(macOS 14, *) {
+                    Image(systemName: "ellipsis.circle")
+                        .symbolEffect(.variableColor.iterative.reversing)
+                } else {
+                    Image(systemName: "ellipsis.circle")
+                }
+            case .done:
+                Image(systemName: "checkmark.circle.fill")
+            case .idle:
+                if viewModel.isEnabled {
+                    MenuBarLabel().environmentObject(viewModel)
+                } else {
+                    Image(systemName: "pause.circle.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                }
         }
     }
 }

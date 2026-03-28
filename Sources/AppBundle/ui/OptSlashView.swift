@@ -1,6 +1,46 @@
 import AppKit
 import SwiftUI
 
+@MainActor func runClaudeWorkflow(_ prompt: String) {
+    print("Sending prompt", prompt)
+    TrayMenuModel.shared.workflowRunState = .running
+    let process = Process()
+    process.executableURL = URL(filePath: "/bin/zsh")
+    process.arguments = [
+        "-c", "export PATH=\"$HOME/.local/bin:$PATH\" && claude --model claude-haiku-4-5-20251001 -p \(prompt.shellEscaped)",
+    ]
+    let stdoutPipe = Pipe()
+    let stderrPipe = Pipe()
+    process.standardOutput = stdoutPipe
+    process.standardError = stderrPipe
+    process.terminationHandler = { process in
+        Task { @MainActor in
+            print("claude exited with code \(process.terminationStatus)")
+            TrayMenuModel.shared.workflowRunState = .done
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            TrayMenuModel.shared.workflowRunState = .idle
+        }
+    }
+    do { try process.run() } catch {
+        TrayMenuModel.shared.workflowRunState = .idle
+        return
+    }
+    DispatchQueue.global().async {
+        let out = String(data: stdoutPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+        let err = String(data: stderrPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+        Task { @MainActor in
+            if !out.isEmpty { print("stdout:", out) }
+            if !err.isEmpty { print("stderr:", err) }
+        }
+    }
+}
+
+extension String {
+    fileprivate var shellEscaped: String {
+        "'" + replacingOccurrences(of: "'", with: "'\\''") + "'"
+    }
+}
+
 // MARK: - Workflow Management Panel
 
 public final class OptSlashAddWorkflowPanel: NSPanel {
@@ -166,6 +206,7 @@ public final class OptSlashPanel: NSPanel {
             workflows: WorkflowStore.shared.workflows,
             onSubmit: { workflow in
                 print(workflow.name)
+                runClaudeWorkflow(workflow.prompt)
                 self.close()
             },
             onCancel: { self.close() }
@@ -227,7 +268,9 @@ struct OptSlashView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(index == selectedIndex ? Color.accentColor.opacity(0.2) : .clear)
+                        .background(
+                            index == selectedIndex ? Color.accentColor.opacity(0.2) : .clear
+                        )
                         .cornerRadius(6)
                         .contentShape(Rectangle())
                         .onTapGesture { onSubmit(wf) }

@@ -1,6 +1,10 @@
 import AppKit
 import Common
 
+enum WorkflowRunState {
+    case idle, running, done
+}
+
 public final class TrayMenuModel: ObservableObject {
     @MainActor public static let shared = TrayMenuModel()
 
@@ -12,6 +16,7 @@ public final class TrayMenuModel: ObservableObject {
     @Published var isEnabled: Bool = true
     @Published var workspaces: [WorkspaceViewModel] = []
     @Published var experimentalUISettings: ExperimentalUISettings = ExperimentalUISettings()
+    @Published var workflowRunState: WorkflowRunState = .idle
 }
 
 @MainActor func updateTrayText() {
