@@ -33,12 +33,17 @@ public final class OptSlashPanel: NSPanel {
             close()
             return
         }
-        let view = OptSlashView(onSubmit: { text in
-            print(text)
-            self.close()
-        }, onCancel: {
-            self.close()
-        })
+        let view = OptSlashView(
+            onSubmit: { text in
+                print("submit: \(text)")
+                self.close()
+            },
+            onChange: { text in
+                print("changed: \(text)")
+            },
+            onCancel: {
+                self.close()
+            })
         contentView = NSHostingView(rootView: view.ignoresSafeArea())
         if let screen = NSScreen.main {
             let x = screen.frame.midX - frame.width / 2
@@ -52,6 +57,7 @@ public final class OptSlashPanel: NSPanel {
 
 struct OptSlashView: View {
     let onSubmit: (String) -> Void
+    let onChange: (String) -> Void
     let onCancel: () -> Void
 
     var body: some View {
@@ -62,6 +68,7 @@ struct OptSlashView: View {
             AutoFocusTextField(
                 placeholder: "Zuo Workflow Search",
                 onSubmit: onSubmit,
+                onChange: onChange,
                 onCancel: onCancel
             )
             .frame(maxWidth: .infinity)
@@ -78,6 +85,7 @@ struct OptSlashView: View {
 struct AutoFocusTextField: NSViewRepresentable {
     let placeholder: String
     let onSubmit: (String) -> Void
+    let onChange: (String) -> Void
     let onCancel: () -> Void
 
     func makeNSView(context: Context) -> NSTextField {
@@ -102,7 +110,14 @@ struct AutoFocusTextField: NSViewRepresentable {
         let parent: AutoFocusTextField
         init(_ parent: AutoFocusTextField) { self.parent = parent }
 
-        func control(_ control: NSControl, textView: NSTextView, doCommandBy selector: Selector) -> Bool {
+        func controlTextDidChange(_ notification: Notification) {
+            guard let field = notification.object as? NSTextField else { return }
+            parent.onChange(field.stringValue)
+        }
+
+        func control(_ control: NSControl, textView: NSTextView, doCommandBy selector: Selector)
+            -> Bool
+        {
             if selector == #selector(NSResponder.insertNewline(_:)) {
                 parent.onSubmit(control.stringValue)
                 return true
