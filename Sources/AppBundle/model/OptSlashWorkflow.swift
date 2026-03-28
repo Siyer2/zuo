@@ -13,6 +13,52 @@ struct OptSlashWorkflow: Codable, Identifiable, Equatable {
 }
 
 @MainActor
+final class PermissionStore {
+    static let shared = PermissionStore()
+    private(set) var allowed: [String] = []
+
+    private var fileUrl: URL {
+        let dir = FileManager.default.homeDirectoryForCurrentUser
+            .appending(path: ".config/zuo/memory")
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.appending(path: "claude-permissions.json")
+    }
+
+    var filePath: String {
+        let url = fileUrl
+        if !FileManager.default.fileExists(atPath: url.path) { save() }
+        return url.path
+    }
+
+    func load() {
+        guard let data = try? Data(contentsOf: fileUrl),
+              let root = try? JSONDecoder().decode(PermissionFile.self, from: data)
+        else { return }
+        allowed = root.permissions.allow
+    }
+
+    func addPermission(_ key: String) {
+        load()
+        guard !allowed.contains(key) else { return }
+        allowed.append(key)
+        save()
+    }
+
+    private func save() {
+        let file = PermissionFile(permissions: PermissionFile.Permissions(allow: allowed))
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        guard let data = try? encoder.encode(file) else { return }
+        try? data.write(to: fileUrl)
+    }
+
+    private struct PermissionFile: Codable {
+        struct Permissions: Codable { var allow: [String] }
+        var permissions: Permissions
+    }
+}
+
+@MainActor
 final class WorkflowStore {
     static let shared = WorkflowStore()
     private(set) var workflows: [OptSlashWorkflow] = []

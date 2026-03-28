@@ -52,6 +52,8 @@ public func menuBar(viewModel: TrayMenuModel) -> some Scene { // todo should it 
                 }
             case .done:
                 Image(systemName: "checkmark.circle.fill")
+            case .error:
+                Image(systemName: "exclamationmark.circle.fill")
             case .idle:
                 if viewModel.isEnabled {
                     MenuBarLabel().environmentObject(viewModel)

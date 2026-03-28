@@ -2,7 +2,16 @@ import AppKit
 import Common
 
 enum WorkflowRunState {
-    case idle, running, done
+    case idle, running, done, error
+}
+
+struct WorkflowResult: Decodable {
+    enum Status: String, Decodable { case success, error, missing_connector }
+    let status: Status
+    let message: String
+    let connector_name: String?
+    let connector_instructions: String?
+    let permission_key: String?
 }
 
 public final class TrayMenuModel: ObservableObject {

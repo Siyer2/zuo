@@ -1,37 +1,270 @@
 import AppKit
 import SwiftUI
 
+private let structuredOutputInstruction = """
+
+    IMPORTANT: Respond with ONLY a JSON object (no markdown fences, no extra text).
+    Schema: {"status":"success"|"error"|"missing_connector", "message":"...", "connector_name":"...", "connector_instructions":"...", "permission_key":"..."}
+    - "success": workflow completed, put result summary in message.
+    - "error": something went wrong, put error details in message.
+    - "missing_connector": a connector/integration permission is required. Set connector_name, connector_instructions, and permission_key (the exact string to add to settings.local.json permissions.allow, e.g. "WebFetch(domain:example.com)" or "Bash").
+    """
+
+@MainActor private var lastWorkflowPrompt: String?
+
 @MainActor func runClaudeWorkflow(_ prompt: String) {
+    let claudePath = FileManager.default.homeDirectoryForCurrentUser
+        .appending(path: ".local/bin/claude").path
+    guard FileManager.default.isExecutableFile(atPath: claudePath) else {
+        showWorkflowError(
+            "Claude Code is not installed.\nInstall it from https://docs.anthropic.com/en/docs/claude-code"
+        )
+        return
+    }
     print("Sending prompt", prompt)
+    lastWorkflowPrompt = prompt
     TrayMenuModel.shared.workflowRunState = .running
+    let model = "claude-haiku-4-5-20251001"
+    let settingsPath = PermissionStore.shared.filePath.shellEscaped
+    let fullPrompt = (prompt + structuredOutputInstruction).shellEscaped
     let process = Process()
     process.executableURL = URL(filePath: "/bin/zsh")
     process.arguments = [
-        "-c", "export PATH=\"$HOME/.local/bin:$PATH\" && claude --model claude-haiku-4-5-20251001 -p \(prompt.shellEscaped)",
+        "-c",
+        "export PATH=\"$HOME/.local/bin:$PATH\" && claude --settings \(settingsPath) -p \(fullPrompt) --model \(model)",
     ]
     let stdoutPipe = Pipe()
     let stderrPipe = Pipe()
     process.standardOutput = stdoutPipe
     process.standardError = stderrPipe
-    process.terminationHandler = { process in
-        Task { @MainActor in
-            print("claude exited with code \(process.terminationStatus)")
-            TrayMenuModel.shared.workflowRunState = .done
-            try? await Task.sleep(nanoseconds: 3_000_000_000)
-            TrayMenuModel.shared.workflowRunState = .idle
-        }
-    }
     do { try process.run() } catch {
-        TrayMenuModel.shared.workflowRunState = .idle
+        showWorkflowError("Failed to launch Claude Code: \(error.localizedDescription)")
         return
     }
     DispatchQueue.global().async {
-        let out = String(data: stdoutPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
-        let err = String(data: stderrPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+        let outData = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
+        let out = String(data: outData, encoding: .utf8) ?? ""
+        let err =
+            String(data: stderrPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)
+            ?? ""
         Task { @MainActor in
             if !out.isEmpty { print("stdout:", out) }
             if !err.isEmpty { print("stderr:", err) }
+            handleWorkflowOutput(out, stderr: err)
         }
+    }
+}
+
+@MainActor private func handleWorkflowOutput(_ output: String, stderr: String) {
+    guard let result = parseWorkflowResult(output) else {
+        let detail = stderr.isEmpty ? String(output.prefix(200)) : String(stderr.prefix(200))
+        showWorkflowError(detail.isEmpty ? "No response from Claude Code." : detail)
+        return
+    }
+    switch result.status {
+    case .success:
+        markWorkflowDone()
+    case .error:
+        showWorkflowError(result.message)
+    case .missing_connector:
+        let name = result.connector_name ?? "Unknown connector"
+        let key = result.permission_key
+        TrayMenuModel.shared.workflowRunState = .idle
+        PermissionPromptPanel.shared.show(connectorName: name, permissionKey: key) {
+            guard let key else { return }
+            PermissionStore.shared.addPermission(key)
+            if let prompt = lastWorkflowPrompt { runClaudeWorkflow(prompt) }
+        }
+    }
+}
+
+private func parseWorkflowResult(_ output: String) -> WorkflowResult? {
+    if let data = output.data(using: .utf8),
+        let result = try? JSONDecoder().decode(WorkflowResult.self, from: data)
+    {
+        return result
+    }
+    guard let start = output.firstIndex(of: "{"),
+        let end = output.lastIndex(of: "}"), start < end
+    else { return nil }
+    let json = output[start...end]
+    guard let data = json.data(using: .utf8) else { return nil }
+    return try? JSONDecoder().decode(WorkflowResult.self, from: data)
+}
+
+@MainActor private func markWorkflowDone() {
+    TrayMenuModel.shared.workflowRunState = .done
+    Task {
+        try? await Task.sleep(nanoseconds: 3_000_000_000)
+        TrayMenuModel.shared.workflowRunState = .idle
+    }
+}
+
+@MainActor private func showWorkflowError(_ message: String) {
+    TrayMenuModel.shared.workflowRunState = .idle
+    WorkflowErrorPanel.shared.show(message: message)
+}
+
+// MARK: - Permission Prompt Panel
+
+final class PermissionPromptPanel: NSPanel {
+    @MainActor static let shared = PermissionPromptPanel()
+
+    private init() {
+        super.init(
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 0),
+            styleMask: [.nonactivatingPanel, .titled, .fullSizeContentView, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        self.isFloatingPanel = true
+        self.level = .floating
+        self.titleVisibility = .hidden
+        self.titlebarAppearsTransparent = true
+        self.isMovableByWindowBackground = false
+        self.isReleasedWhenClosed = false
+        self.backgroundColor = .clear
+        self.isOpaque = false
+        self.standardWindowButton(.closeButton)?.isHidden = true
+        self.standardWindowButton(.miniaturizeButton)?.isHidden = true
+        self.standardWindowButton(.zoomButton)?.isHidden = true
+    }
+
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { true }
+
+    @MainActor func show(
+        connectorName: String, permissionKey: String?, onAllow: @escaping () -> Void
+    ) {
+        let view = PermissionPromptView(
+            connectorName: connectorName,
+            permissionKey: permissionKey,
+            onAllow: {
+                onAllow()
+                self.close()
+            },
+            onDeny: { self.close() }
+        )
+        let hostingView = NSHostingView(rootView: view.ignoresSafeArea())
+        hostingView.frame.size = hostingView.fittingSize
+        contentView = hostingView
+        setContentSize(hostingView.fittingSize)
+        if let screen = NSScreen.main {
+            setFrameOrigin(
+                NSPoint(
+                    x: screen.frame.midX - frame.width / 2,
+                    y: screen.frame.midY - frame.height / 2))
+        }
+        orderFront(nil)
+        makeKey()
+    }
+}
+
+struct PermissionPromptView: View {
+    let connectorName: String
+    let permissionKey: String?
+    let onAllow: () -> Void
+    let onDeny: () -> Void
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "lock.shield")
+                .font(.system(size: 32))
+                .foregroundStyle(.orange)
+            Text("Permission Required")
+                .font(.system(size: 16, weight: .semibold))
+            Text("\(connectorName) needs access to run this workflow.")
+                .font(.system(size: 13))
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            if let key = permissionKey {
+                Text(key)
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(.tertiary)
+            }
+            HStack(spacing: 12) {
+                Button("Deny") { onDeny() }
+                    .keyboardShortcut(.cancelAction)
+                Button("Allow") { onAllow() }
+                    .keyboardShortcut(.defaultAction)
+            }
+        }
+        .padding(20)
+        .frame(width: 400)
+        .background(VisualEffectBackground(material: .hudWindow, blendingMode: .behindWindow))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+}
+
+// MARK: - Workflow Error Panel
+
+final class WorkflowErrorPanel: NSPanel {
+    @MainActor static let shared = WorkflowErrorPanel()
+
+    private init() {
+        super.init(
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 0),
+            styleMask: [.nonactivatingPanel, .titled, .fullSizeContentView, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        self.isFloatingPanel = true
+        self.level = .floating
+        self.titleVisibility = .hidden
+        self.titlebarAppearsTransparent = true
+        self.isMovableByWindowBackground = false
+        self.isReleasedWhenClosed = false
+        self.backgroundColor = .clear
+        self.isOpaque = false
+        self.standardWindowButton(.closeButton)?.isHidden = true
+        self.standardWindowButton(.miniaturizeButton)?.isHidden = true
+        self.standardWindowButton(.zoomButton)?.isHidden = true
+    }
+
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { true }
+
+    @MainActor func show(message: String) {
+        let view = WorkflowErrorView(message: message, onDismiss: { self.close() })
+        let hostingView = NSHostingView(rootView: view.ignoresSafeArea())
+        hostingView.frame.size = hostingView.fittingSize
+        contentView = hostingView
+        setContentSize(hostingView.fittingSize)
+        if let screen = NSScreen.main {
+            let x = screen.frame.midX - frame.width / 2
+            let y = screen.frame.midY - frame.height / 2
+            setFrameOrigin(NSPoint(x: x, y: y))
+        }
+        orderFront(nil)
+        makeKey()
+    }
+}
+
+struct WorkflowErrorView: View {
+    let message: String
+    let onDismiss: () -> Void
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 32))
+                .foregroundStyle(.yellow)
+            Text("Workflow Error")
+                .font(.system(size: 16, weight: .semibold))
+            Text(message)
+                .font(.system(size: 13))
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Button("OK") { onDismiss() }
+                .keyboardShortcut(.defaultAction)
+        }
+        .padding(20)
+        .frame(width: 400)
+        .background(
+            VisualEffectBackground(material: .hudWindow, blendingMode: .behindWindow)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 
@@ -165,6 +398,96 @@ struct ManageWorkflowsView: View {
     }
 }
 
+// MARK: - Claude Notice
+
+private func claudeNoticeUrl() -> URL {
+    FileManager.default.homeDirectoryForCurrentUser.appending(
+        path: ".config/zuo/has-seen-claude-notice")
+}
+
+private func hasSeenClaudeNotice() -> Bool {
+    FileManager.default.fileExists(atPath: claudeNoticeUrl().path)
+}
+
+private func markClaudeNoticeSeen() {
+    let url = claudeNoticeUrl()
+    try? FileManager.default.createDirectory(
+        at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+    FileManager.default.createFile(atPath: url.path, contents: nil)
+}
+
+final class ClaudeNoticePanel: NSPanel {
+    @MainActor static let shared = ClaudeNoticePanel()
+
+    private init() {
+        super.init(
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 0),
+            styleMask: [.nonactivatingPanel, .titled, .fullSizeContentView],
+            backing: .buffered,
+            defer: false
+        )
+        self.isFloatingPanel = true
+        self.level = .floating
+        self.titleVisibility = .hidden
+        self.titlebarAppearsTransparent = true
+        self.isMovableByWindowBackground = false
+        self.isReleasedWhenClosed = false
+        self.backgroundColor = .clear
+        self.isOpaque = false
+        self.standardWindowButton(.closeButton)?.isHidden = true
+        self.standardWindowButton(.miniaturizeButton)?.isHidden = true
+        self.standardWindowButton(.zoomButton)?.isHidden = true
+    }
+
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { true }
+
+    @MainActor func show(onAcknowledge: @escaping () -> Void) {
+        let view = ClaudeNoticeView(onAcknowledge: {
+            onAcknowledge()
+            self.close()
+        })
+        let hostingView = NSHostingView(rootView: view.ignoresSafeArea())
+        hostingView.frame.size = hostingView.fittingSize
+        contentView = hostingView
+        setContentSize(hostingView.fittingSize)
+        if let screen = NSScreen.main {
+            setFrameOrigin(
+                NSPoint(
+                    x: screen.frame.midX - frame.width / 2,
+                    y: screen.frame.midY - frame.height / 2))
+        }
+        orderFront(nil)
+        makeKey()
+    }
+}
+
+struct ClaudeNoticeView: View {
+    let onAcknowledge: () -> Void
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "info.circle")
+                .font(.system(size: 32))
+                .foregroundStyle(.blue)
+            Text("OptSlash uses Claude Code")
+                .font(.system(size: 16, weight: .semibold))
+            Text(
+                "Workflows run using the Claude Code CLI installed on your machine. Make sure it's set up and authenticated."
+            )
+            .font(.system(size: 13))
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+            Button("Got it") { onAcknowledge() }
+                .keyboardShortcut(.defaultAction)
+        }
+        .padding(20)
+        .frame(width: 400)
+        .background(VisualEffectBackground(material: .hudWindow, blendingMode: .behindWindow))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+}
+
 // MARK: - OptSlash Panel (fuzzy search workflows)
 
 private let maxVisibleWorkflows = 5
@@ -201,6 +524,17 @@ public final class OptSlashPanel: NSPanel {
             close()
             return
         }
+        if !hasSeenClaudeNotice() {
+            ClaudeNoticePanel.shared.show {
+                markClaudeNoticeSeen()
+                self.showOptSlash()
+            }
+            return
+        }
+        showOptSlash()
+    }
+
+    @MainActor private func showOptSlash() {
         WorkflowStore.shared.load()
         let view = OptSlashView(
             workflows: WorkflowStore.shared.workflows,
