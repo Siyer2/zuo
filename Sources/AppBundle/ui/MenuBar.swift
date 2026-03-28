@@ -5,11 +5,8 @@ import SwiftUI
 @MainActor
 public func menuBar(viewModel: TrayMenuModel) -> some Scene { // todo should it be converted to "SwiftUI struct"?
     MenuBarExtra {
-        let shortIdentification = "\(zuoAppName) v\(zuoAppVersion) \(gitShortHash)"
-        let identification      = "\(zuoAppName) v\(zuoAppVersion) \(gitHash)"
-        Text(shortIdentification)
-        Button("Copy to clipboard") { identification.copyToClipboard() }
-            .keyboardShortcut("C", modifiers: .command)
+        Text("\(zuoAppName) v\(zuoAppVersion) \(gitShortHash)")
+        Button("Add an OptSlash workflow") { OptSlashAddWorkflowPanel.shared.show() }
         Divider()
         if let token: RunSessionGuard = .isServerEnabled {
             Text("Workspaces:")
