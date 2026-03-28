@@ -113,7 +113,7 @@ on-mode-changed = []
     # '''
 
     # See: https://nikitabobko.github.io/Zuo/commands#layout
-    alt-slash = 'layout tiles horizontal vertical'
+    alt-slash = 'opt-slash'
     alt-comma = 'layout accordion horizontal vertical'
 
     # See: https://nikitabobko.github.io/Zuo/commands#focus
