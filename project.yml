@@ -53,3 +53,5 @@ targets:
       properties:
         # Accessibility API doesn't work in sandboxed apps
         com.apple.security.app-sandbox: false
+        # Required for TCC to prompt for calendar access (EventKit)
+        com.apple.security.personal-information.calendars: true

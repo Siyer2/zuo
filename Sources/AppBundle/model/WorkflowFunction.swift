@@ -49,15 +49,36 @@ enum WorkflowError: Error {
 
 func getNextCalendarEvent(titleFilter: ((String) -> Bool)? = nil) async throws -> CalendarEvent? {
     let store = EKEventStore()
-    let granted: Bool
+    let status = EKEventStore.authorizationStatus(for: .event)
+
+    // Already authorized — skip the request.
+    let alreadyGranted: Bool
     if #available(macOS 14, *) {
-        granted = (try? await store.requestFullAccessToEvents()) ?? false
+        alreadyGranted = status == .fullAccess
     } else {
-        granted = await withCheckedContinuation { cont in
-            store.requestAccess(to: .event) { g, _ in cont.resume(returning: g) }
-        }
+        alreadyGranted = status == .authorized
     }
-    guard granted else { throw WorkflowError.calendarAccessDenied }
+    if alreadyGranted {
+        // fall through to event fetching below
+    } else if status == .notDetermined {
+        // First time — activate the app so macOS can show the native TCC prompt.
+        // Agent apps (LSUIElement) are never active, so the dialog won't appear without this.
+        await MainActor.run {
+            if #available(macOS 14, *) { NSApp.activate() } else { NSApp.activate(ignoringOtherApps: true) }
+        }
+        let granted: Bool
+        if #available(macOS 14, *) {
+            granted = (try? await store.requestFullAccessToEvents()) ?? false
+        } else {
+            granted = await withCheckedContinuation { cont in
+                store.requestAccess(to: .event) { g, _ in cont.resume(returning: g) }
+            }
+        }
+        guard granted else { throw WorkflowError.calendarAccessDenied }
+    } else {
+        // .denied or .restricted — prompt won't appear again, user must fix in System Settings.
+        throw WorkflowError.calendarAccessDenied
+    }
 
     let now = Date()
     let end = Calendar.current.date(byAdding: .day, value: 7, to: now)!
