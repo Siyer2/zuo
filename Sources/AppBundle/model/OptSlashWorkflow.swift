@@ -14,4 +14,10 @@ let allWorkflows: [OptSlashWorkflow] = [
         description: "Opens the Zoom/Teams link for your next calendar event",
         run: { await openNextMeeting() }
     ),
+    OptSlashWorkflow(
+        id: "standup",
+        name: "Standup",
+        description: "Opens Jira and your next standup Zoom call side-by-side",
+        run: { await openStandup() }
+    ),
 ]
