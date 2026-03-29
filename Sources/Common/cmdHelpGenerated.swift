@@ -120,6 +120,9 @@ let move_workspace_to_monitor_help_generated = """
 let move_help_generated = """
     zuo move [-h|--help] [--window-id <window-id>] [--boundaries <boundary>] [--boundaries-action <boundary-action>] (left|down|up|right)
     """
+let opt_slash_help_generated = """
+    zuo opt-slash [-h|--help]
+    """
 let reload_config_help_generated = """
     zuo reload-config [-h|--help] [--no-gui] [--dry-run]
     """
