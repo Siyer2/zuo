@@ -99,10 +99,7 @@ struct OptSlashView: View {
                             Text(wf.name)
                                 .font(.system(size: 16, weight: .light))
                             Spacer()
-                            Image(systemName: "info.circle")
-                                .font(.system(size: 14))
-                                .foregroundStyle(.tertiary)
-                                .help(wf.description)
+                            InfoButton(description: wf.description)
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -126,6 +123,27 @@ struct OptSlashView: View {
     private func submitSelected() {
         guard !filtered.isEmpty, filtered.indices.contains(selectedIndex) else { return }
         onSubmit(filtered[selectedIndex])
+    }
+}
+
+// MARK: - Info Button
+
+private struct InfoButton: View {
+    let description: String
+    @State private var isHovering = false
+
+    var body: some View {
+        Image(systemName: "info.circle")
+            .font(.system(size: 14))
+            .foregroundStyle(isHovering ? .secondary : .tertiary)
+            .onHover { isHovering = $0 }
+            .popover(isPresented: $isHovering, arrowEdge: .trailing) {
+                Text(description)
+                    .font(.system(size: 12))
+                    .padding(8)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: 250)
+            }
     }
 }
 
