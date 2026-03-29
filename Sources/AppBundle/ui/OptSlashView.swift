@@ -51,6 +51,15 @@ public final class OptSlashPanel: NSPanel {
             let y = screen.frame.midY + screen.frame.height * 0.2
             setFrameOrigin(NSPoint(x: x, y: y))
         }
+        // Agent apps (LSUIElement) are never the active application.
+        // SwiftUI gesture recognizers on a nonActivatingPanel require the
+        // owning app to be active to deliver mouse events — without this,
+        // onTapGesture silently swallows clicks in codesigned/DMG builds.
+        if #available(macOS 14, *) {
+            NSApp.activate()
+        } else {
+            NSApp.activate(ignoringOtherApps: true)
+        }
         orderFront(nil)
         makeKey()
     }
