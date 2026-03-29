@@ -20,7 +20,24 @@ struct CalendarEvent {
     }
 }
 
-func getNextCalendarEvent(titleFilter: ((String) -> Bool)? = nil) async -> CalendarEvent? {
+enum WorkflowError: Error {
+    case calendarAccessDenied
+    case noEventsFound
+    case noMeetingLink(eventTitle: String)
+
+    var message: String {
+        switch self {
+        case .calendarAccessDenied:
+            return "Calendar access denied — grant in System Settings → Privacy & Security → Calendars"
+        case .noEventsFound:
+            return "No upcoming calendar events found"
+        case .noMeetingLink(let title):
+            return "No Zoom/Teams link found in \"\(title)\""
+        }
+    }
+}
+
+func getNextCalendarEvent(titleFilter: ((String) -> Bool)? = nil) async throws -> CalendarEvent? {
     let store = EKEventStore()
     let granted: Bool
     if #available(macOS 14, *) {
@@ -30,7 +47,7 @@ func getNextCalendarEvent(titleFilter: ((String) -> Bool)? = nil) async -> Calen
             store.requestAccess(to: .event) { g, _ in cont.resume(returning: g) }
         }
     }
-    guard granted else { return nil }
+    guard granted else { throw WorkflowError.calendarAccessDenied }
 
     let now = Date()
     let end = Calendar.current.date(byAdding: .day, value: 7, to: now)!
@@ -80,26 +97,59 @@ func getNextCalendarEvent(titleFilter: ((String) -> Bool)? = nil) async -> Calen
     }
 }
 
+@MainActor func setWorkflowError(_ error: WorkflowError) {
+    TrayMenuModel.shared.workflowRunState = .error
+    OptSlashPanel.shared.showError(error.message)
+    Task {
+        try? await Task.sleep(nanoseconds: 5_000_000_000)
+        TrayMenuModel.shared.workflowRunState = .idle
+    }
+}
+
 // MARK: - Workflows
 
 @MainActor func openNextMeeting() async {
     TrayMenuModel.shared.workflowRunState = .running
-    guard let event = await getNextCalendarEvent(),
-          let link = event.meetingLink, let url = URL(string: link) else {
-        TrayMenuModel.shared.workflowRunState = .idle
-        return
+    do {
+        guard let event = try await getNextCalendarEvent() else {
+            setWorkflowError(.noEventsFound)
+            return
+        }
+        guard let link = event.meetingLink, let url = URL(string: link) else {
+            setWorkflowError(.noMeetingLink(eventTitle: event.title))
+            return
+        }
+        NSWorkspace.shared.open(url)
+        setWorkflowDone()
+    } catch let error as WorkflowError {
+        setWorkflowError(error)
+    } catch {
+        setWorkflowError(.noEventsFound)
     }
-    NSWorkspace.shared.open(url)
-    setWorkflowDone()
 }
 
 @MainActor func openStandup() async {
     TrayMenuModel.shared.workflowRunState = .running
 
-    guard let event = await getNextCalendarEvent(titleFilter: {
-        let l = $0.lowercased(); return l.contains("standup") || l.contains("stand up")
-    }), let link = event.meetingLink, let zoomURL = URL(string: link) else {
-        TrayMenuModel.shared.workflowRunState = .idle
+    let event: CalendarEvent?
+    do {
+        event = try await getNextCalendarEvent(titleFilter: {
+            let l = $0.lowercased(); return l.contains("standup") || l.contains("stand up")
+        })
+    } catch let error as WorkflowError {
+        setWorkflowError(error)
+        return
+    } catch {
+        setWorkflowError(.noEventsFound)
+        return
+    }
+
+    guard let event else {
+        setWorkflowError(.noEventsFound)
+        return
+    }
+    guard let link = event.meetingLink, let zoomURL = URL(string: link) else {
+        setWorkflowError(.noMeetingLink(eventTitle: event.title))
         return
     }
 
