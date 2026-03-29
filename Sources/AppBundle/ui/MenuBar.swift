@@ -6,7 +6,6 @@ import SwiftUI
 public func menuBar(viewModel: TrayMenuModel) -> some Scene { // todo should it be converted to "SwiftUI struct"?
     MenuBarExtra {
         Text("\(zuoAppName) v\(zuoAppVersion) \(gitShortHash)")
-        Button("Add an OptSlash workflow") { OptSlashAddWorkflowPanel.shared.show() }
         Divider()
         if let token: RunSessionGuard = .isServerEnabled {
             Text("Workspaces:")
