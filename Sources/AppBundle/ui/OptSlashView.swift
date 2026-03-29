@@ -65,10 +65,13 @@ public final class OptSlashPanel: NSPanel {
         makeKey()
     }
 
-    @MainActor func showError(_ message: String) {
-        let view = OptSlashErrorView(message: message, onDismiss: { self.close() })
+    @MainActor func showError(_ error: WorkflowError) {
+        let view = OptSlashErrorView(
+            message: error.message,
+            settingsURL: error.settingsURL,
+            onDismiss: { self.close() }
+        )
         contentView = NSHostingView(rootView: view.ignoresSafeArea())
-        // Resize to fit error content
         let fitSize = contentView!.fittingSize
         setContentSize(NSSize(width: max(fitSize.width, 480), height: fitSize.height))
         if let screen = NSScreen.main {
@@ -83,9 +86,12 @@ public final class OptSlashPanel: NSPanel {
         }
         orderFront(nil)
         makeKey()
-        Task {
-            try? await Task.sleep(nanoseconds: 5_000_000_000)
-            if self.isVisible { self.close() }
+        // Auto-dismiss only if there's no action for the user to click
+        if error.settingsURL == nil {
+            Task {
+                try? await Task.sleep(nanoseconds: 5_000_000_000)
+                if self.isVisible { self.close() }
+            }
         }
     }
 }
@@ -164,6 +170,7 @@ struct OptSlashView: View {
 
 struct OptSlashErrorView: View {
     let message: String
+    let settingsURL: URL?
     let onDismiss: () -> Void
 
     var body: some View {
@@ -176,6 +183,20 @@ struct OptSlashErrorView: View {
                 .foregroundStyle(.primary)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer()
+            if let settingsURL {
+                Text("Open System Settings")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.accentColor)
+                    .cornerRadius(6)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        NSWorkspace.shared.open(settingsURL)
+                        onDismiss()
+                    }
+            }
             Text("esc")
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(.tertiary)

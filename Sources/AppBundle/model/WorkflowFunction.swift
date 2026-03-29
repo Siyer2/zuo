@@ -28,11 +28,21 @@ enum WorkflowError: Error {
     var message: String {
         switch self {
         case .calendarAccessDenied:
-            return "Calendar access denied — grant in System Settings → Privacy & Security → Calendars"
+            return "Calendar access required"
         case .noEventsFound:
             return "No upcoming calendar events found"
         case .noMeetingLink(let title):
             return "No Zoom/Teams link found in \"\(title)\""
+        }
+    }
+
+    /// A URL that opens System Settings to the relevant pane, if applicable.
+    var settingsURL: URL? {
+        switch self {
+        case .calendarAccessDenied:
+            return URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Calendars")
+        default:
+            return nil
         }
     }
 }
@@ -99,7 +109,7 @@ func getNextCalendarEvent(titleFilter: ((String) -> Bool)? = nil) async throws -
 
 @MainActor func setWorkflowError(_ error: WorkflowError) {
     TrayMenuModel.shared.workflowRunState = .error
-    OptSlashPanel.shared.showError(error.message)
+    OptSlashPanel.shared.showError(error)
     Task {
         try? await Task.sleep(nanoseconds: 5_000_000_000)
         TrayMenuModel.shared.workflowRunState = .idle
