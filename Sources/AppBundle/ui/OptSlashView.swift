@@ -31,6 +31,7 @@ public final class OptSlashPanel: NSPanel {
 
     override public var canBecomeKey: Bool { true }
     override public var canBecomeMain: Bool { true }
+    override public func cancelOperation(_ sender: Any?) { close() }
 
     @MainActor func toggle() {
         if isVisible {
@@ -51,8 +52,47 @@ public final class OptSlashPanel: NSPanel {
             let y = screen.frame.midY + screen.frame.height * 0.2
             setFrameOrigin(NSPoint(x: x, y: y))
         }
+        // Agent apps (LSUIElement) are never the active application.
+        // SwiftUI gesture recognizers on a nonActivatingPanel require the
+        // owning app to be active to deliver mouse events — without this,
+        // onTapGesture silently swallows clicks in codesigned/DMG builds.
+        if #available(macOS 14, *) {
+            NSApp.activate()
+        } else {
+            NSApp.activate(ignoringOtherApps: true)
+        }
         orderFront(nil)
         makeKey()
+    }
+
+    @MainActor func showError(_ error: WorkflowError) {
+        let view = OptSlashErrorView(
+            message: error.message,
+            settingsURL: error.settingsURL,
+            onDismiss: { self.close() }
+        )
+        contentView = NSHostingView(rootView: view.ignoresSafeArea())
+        let fitSize = contentView!.fittingSize
+        setContentSize(NSSize(width: max(fitSize.width, 480), height: fitSize.height))
+        if let screen = NSScreen.main {
+            let x = screen.frame.midX - frame.width / 2
+            let y = screen.frame.midY + screen.frame.height * 0.2
+            setFrameOrigin(NSPoint(x: x, y: y))
+        }
+        if #available(macOS 14, *) {
+            NSApp.activate()
+        } else {
+            NSApp.activate(ignoringOtherApps: true)
+        }
+        orderFront(nil)
+        makeKey()
+        // Auto-dismiss only if there's no action for the user to click
+        if error.settingsURL == nil {
+            Task {
+                try? await Task.sleep(nanoseconds: 5_000_000_000)
+                if self.isVisible { self.close() }
+            }
+        }
     }
 }
 
@@ -123,6 +163,54 @@ struct OptSlashView: View {
     private func submitSelected() {
         guard !filtered.isEmpty, filtered.indices.contains(selectedIndex) else { return }
         onSubmit(filtered[selectedIndex])
+    }
+}
+
+// MARK: - Error View
+
+struct OptSlashErrorView: View {
+    let message: String
+    let settingsURL: URL?
+    let onDismiss: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 20))
+                .foregroundStyle(.yellow)
+            Text(message)
+                .font(.system(size: 14, weight: .regular))
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer()
+            if let settingsURL {
+                Text("Open System Settings")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.accentColor)
+                    .cornerRadius(6)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        NSWorkspace.shared.open(settingsURL)
+                        onDismiss()
+                    }
+            }
+            Text("esc")
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(.tertiary)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Color.primary.opacity(0.08))
+                .cornerRadius(4)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(
+            VisualEffectBackground(material: .hudWindow, blendingMode: .behindWindow)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 

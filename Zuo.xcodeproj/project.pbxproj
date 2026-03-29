@@ -176,6 +176,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Zuo needs calendar access to find your next meeting link";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Zuo needs calendar access to find your next meeting link";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -256,6 +258,8 @@
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Zuo needs calendar access to find your next meeting link";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Zuo needs calendar access to find your next meeting link";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

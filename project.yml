@@ -33,6 +33,8 @@ targets:
         # Specifies whether the app runs as an agent app. If this key is set to YES, Launch Services runs the app as an agent app.
         # Agent apps do not appear in the Dock or in the Force Quit window (cmd-opt-esc)
         INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription: "Zuo needs calendar access to find your next meeting link"
+        INFOPLIST_KEY_NSCalendarsUsageDescription: "Zuo needs calendar access to find your next meeting link"
         CODE_SIGN_IDENTITY: ${XCODEGEN_ZUO_CODE_SIGN_IDENTITY}
         ENABLE_HARDENED_RUNTIME: YES
       configs:
@@ -51,3 +53,5 @@ targets:
       properties:
         # Accessibility API doesn't work in sandboxed apps
         com.apple.security.app-sandbox: false
+        # Required for TCC to prompt for calendar access (EventKit)
+        com.apple.security.personal-information.calendars: true

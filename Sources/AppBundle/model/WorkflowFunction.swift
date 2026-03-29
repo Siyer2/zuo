@@ -20,17 +20,65 @@ struct CalendarEvent {
     }
 }
 
-func getNextCalendarEvent(titleFilter: ((String) -> Bool)? = nil) async -> CalendarEvent? {
-    let store = EKEventStore()
-    let granted: Bool
-    if #available(macOS 14, *) {
-        granted = (try? await store.requestFullAccessToEvents()) ?? false
-    } else {
-        granted = await withCheckedContinuation { cont in
-            store.requestAccess(to: .event) { g, _ in cont.resume(returning: g) }
+enum WorkflowError: Error {
+    case calendarAccessDenied
+    case noEventsFound
+    case noMeetingLink(eventTitle: String)
+
+    var message: String {
+        switch self {
+        case .calendarAccessDenied:
+            return "Calendar access required"
+        case .noEventsFound:
+            return "No upcoming calendar events found"
+        case .noMeetingLink(let title):
+            return "No Zoom/Teams link found in \"\(title)\""
         }
     }
-    guard granted else { return nil }
+
+    /// A URL that opens System Settings to the relevant pane, if applicable.
+    var settingsURL: URL? {
+        switch self {
+        case .calendarAccessDenied:
+            return URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Calendars")
+        default:
+            return nil
+        }
+    }
+}
+
+func getNextCalendarEvent(titleFilter: ((String) -> Bool)? = nil) async throws -> CalendarEvent? {
+    let store = EKEventStore()
+    let status = EKEventStore.authorizationStatus(for: .event)
+
+    // Already authorized — skip the request.
+    let alreadyGranted: Bool
+    if #available(macOS 14, *) {
+        alreadyGranted = status == .fullAccess
+    } else {
+        alreadyGranted = status == .authorized
+    }
+    if alreadyGranted {
+        // fall through to event fetching below
+    } else if status == .notDetermined {
+        // First time — activate the app so macOS can show the native TCC prompt.
+        // Agent apps (LSUIElement) are never active, so the dialog won't appear without this.
+        await MainActor.run {
+            if #available(macOS 14, *) { NSApp.activate() } else { NSApp.activate(ignoringOtherApps: true) }
+        }
+        let granted: Bool
+        if #available(macOS 14, *) {
+            granted = (try? await store.requestFullAccessToEvents()) ?? false
+        } else {
+            granted = await withCheckedContinuation { cont in
+                store.requestAccess(to: .event) { g, _ in cont.resume(returning: g) }
+            }
+        }
+        guard granted else { throw WorkflowError.calendarAccessDenied }
+    } else {
+        // .denied or .restricted — prompt won't appear again, user must fix in System Settings.
+        throw WorkflowError.calendarAccessDenied
+    }
 
     let now = Date()
     let end = Calendar.current.date(byAdding: .day, value: 7, to: now)!
@@ -80,26 +128,59 @@ func getNextCalendarEvent(titleFilter: ((String) -> Bool)? = nil) async -> Calen
     }
 }
 
+@MainActor func setWorkflowError(_ error: WorkflowError) {
+    TrayMenuModel.shared.workflowRunState = .error
+    OptSlashPanel.shared.showError(error)
+    Task {
+        try? await Task.sleep(nanoseconds: 5_000_000_000)
+        TrayMenuModel.shared.workflowRunState = .idle
+    }
+}
+
 // MARK: - Workflows
 
 @MainActor func openNextMeeting() async {
     TrayMenuModel.shared.workflowRunState = .running
-    guard let event = await getNextCalendarEvent(),
-          let link = event.meetingLink, let url = URL(string: link) else {
-        TrayMenuModel.shared.workflowRunState = .idle
-        return
+    do {
+        guard let event = try await getNextCalendarEvent() else {
+            setWorkflowError(.noEventsFound)
+            return
+        }
+        guard let link = event.meetingLink, let url = URL(string: link) else {
+            setWorkflowError(.noMeetingLink(eventTitle: event.title))
+            return
+        }
+        NSWorkspace.shared.open(url)
+        setWorkflowDone()
+    } catch let error as WorkflowError {
+        setWorkflowError(error)
+    } catch {
+        setWorkflowError(.noEventsFound)
     }
-    NSWorkspace.shared.open(url)
-    setWorkflowDone()
 }
 
 @MainActor func openStandup() async {
     TrayMenuModel.shared.workflowRunState = .running
 
-    guard let event = await getNextCalendarEvent(titleFilter: {
-        let l = $0.lowercased(); return l.contains("standup") || l.contains("stand up")
-    }), let link = event.meetingLink, let zoomURL = URL(string: link) else {
-        TrayMenuModel.shared.workflowRunState = .idle
+    let event: CalendarEvent?
+    do {
+        event = try await getNextCalendarEvent(titleFilter: {
+            let l = $0.lowercased(); return l.contains("standup") || l.contains("stand up")
+        })
+    } catch let error as WorkflowError {
+        setWorkflowError(error)
+        return
+    } catch {
+        setWorkflowError(.noEventsFound)
+        return
+    }
+
+    guard let event else {
+        setWorkflowError(.noEventsFound)
+        return
+    }
+    guard let link = event.meetingLink, let zoomURL = URL(string: link) else {
+        setWorkflowError(.noMeetingLink(eventTitle: event.title))
         return
     }
 
